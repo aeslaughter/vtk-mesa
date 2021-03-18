@@ -2,7 +2,7 @@
 import os
 import sys
 VTK_BUILD_DIR = os.path.join(os.getcwd(), 'build')
-sys.path.append(VTK_BUILD_DIR, 'lib', 'python3.9', 'site-packages')
+sys.path.append(os.path.join(VTK_BUILD_DIR, 'lib', 'python3.9', 'site-packages'))
 import vtk
 
 # Text Mapper
@@ -21,12 +21,16 @@ ren.AddActor(actor)
 renWin = vtk.vtkRenderWindow()
 renWin.SetSize(1000, 1000)
 renWin.AddRenderer(ren)
+#renWin.Update()
+print(renWin)
+#renWin.Render()
 
-# Create a render window interactor.
-iren = vtk.vtkRenderWindowInteractor()
-iren.SetRenderWindow(renWin)
+window_filter = vtk.vtkWindowToImageFilter()
+window_filter.SetInput(renWin)
+window_filter.Update()
 
-# Enable user interface interactor.
-iren.Initialize()
-renWin.Render()
-iren.Start()
+# Write it
+writer = vtk.vtkPNGWriter()
+writer.SetFileName('test.png')
+writer.SetInputData(window_filter.GetOutput())
+writer.Write()
