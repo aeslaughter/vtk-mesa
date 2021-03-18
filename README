@@ -1,0 +1,30 @@
+# Create a conda environment
+conda create -n vtk-offscreen
+conda activate vtk-offscreen
+conda install mesalib cmake moose-mpich
+
+# Get VTK 9.0.1
+git clone git@gitlab.kitware.com:vtk/vtk.git vtk
+cd vtk
+git co v9.0.1
+
+# Compile VTK
+cd ..
+mkdir build
+cd build
+cmake ../vtk -DVTK_USE_X:BOOL=OFF \
+             -DVTK_USE_COCOA:BOOL=OFF \
+             -DVTK_OPENGL_HAS_OSMESA:BOOL=ON \
+             -DVTK_DEFAULT_RENDER_WINDOW_OFFSCREEN:BOOL=ON \
+             -DOSMESA_LIBRARY:PATH=${HOME}/miniconda3/envs/vtk-offscreen/lib/libOSMesa32.dylib \
+             -DOSMESA_INCLUDE_DIR:PATH=${HOME}/miniconda3/envs/vtk-offscreen/include \
+             -DVTK_PYTHON_VERSION=3 \
+             -DVTK_WRAP_PYTHON:BOOL=ON \
+             -DVTK_USE_MPI:BOOL=ON \
+             -DCMAKE_CXX_COMPILER:PATH=${HOME}/miniconda3/envs/vtk-offscreen/bin/mpicxx \
+             -DCMAKE_C_COMPILER:PATH=${HOME}/miniconda3/envs/vtk-offscreen/bin/mpicc \
+             -DCMAKE_BUILD_TYPE=Debug \
+             -DBUILD_SHARED_LIBS:BOOL=ON \
+             -DCMAKE_INSTALL_PREFIX:PATH=${HOME}/projects/vtk-mesa/install \
+             -DCMAKE_INSTALL_RPATH:PATH=${HOME}/projects/vtk-mesa/install/lib \
+             -DCMAKE_INSTALL_LIBDIR:PATH=lib
